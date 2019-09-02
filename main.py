@@ -6,6 +6,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 import matplotlib.pyplot as plt
 import numpy as np
+from dataclass import HymenopteraDataset, make_datapath_list
+from data_transform import ImageTransform
 
 
 class Net(nn.Module):
@@ -27,31 +29,63 @@ class Net(nn.Module):
         x = self.fc3(x)
         return x
 
-
 if __name__ == '__main__':
-    #freeze_support()
-    #データセット系
-    # ##Augmentationや前処理の定義
-    transform = transforms.Compose(
-    [transforms.ToTensor(),
-     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    size = 224
+    mean = (0.485, 0.456, 0.406)
+    std = (0.229, 0.224, 0.225)
+    train_list = make_datapath_list(phase="train")
+    val_list = make_datapath_list(phase="val")
 
-##データセットのダウンロード
-    trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
-                                        download=True, transform=transform)
-##データセットクラスの定義
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
-                                          shuffle=True, num_workers=2)
-##データセットのダウンロード
-    testset = torchvision.datasets.CIFAR10(root='./data', train=False,
-                                       download=True, transform=transform)
-##データセットクラスの定義
-    testloader = torch.utils.data.DataLoader(testset, batch_size=4,
-                                         shuffle=False, num_workers=2)
+    train_dataset = HymenopteraDataset(
+        file_list=train_list, transform=ImageTransform(size, mean, std), phase='train')
 
-#クラス
-    classes = ('plane', 'car', 'bird', 'cat',
-           'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+    val_dataset = HymenopteraDataset(
+        file_list=val_list, transform=ImageTransform(size, mean, std), phase='val')
+
+    # 動作確認
+    index = 0
+    print(train_dataset.__getitem__(index)[0].size())
+    print(train_dataset.__getitem__(index)[1])
+
+    print(val_dataset.__getitem__(index)[0].size())
+    print(val_dataset.__getitem__(index)[1])
+
+    batch_size = 32
+
+    # DataLoaderを作成
+    train_dataloader = torch.utils.data.DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True)
+
+    val_dataloader = torch.utils.data.DataLoader(
+        val_dataset, batch_size=batch_size, shuffle=False)
+
+    # 辞書型変数にまとめる
+    dataloaders_dict = {"train": train_dataloader, "val": val_dataloader}
+
+    # 動作確認
+    batch_iterator = iter(dataloaders_dict["train"])  # イテレータに変換
+    inputs, labels = next(
+        batch_iterator)  # 1番目の要素を取り出す
+    print(inputs.size())
+    print(labels)
+
+    batch_size = 32
+
+# DataLoaderを作成
+    train_dataloader = torch.utils.data.DataLoader(
+    train_dataset, batch_size=batch_size, shuffle=True)
+
+    val_dataloader = torch.utils.data.DataLoader(
+    val_dataset, batch_size=batch_size, shuffle=False)
+
+# 辞書型変数にまとめる
+    dataloaders_dict = {"train": train_dataloader, "val": val_dataloader}
+
+# 動作確認
+    batch_iterator = iter(dataloaders_dict["train"])  # イテレータに変換
+    inputs, labels = next(
+    batch_iterator)  # 1番目の要素を取り出す
+
 
 #ネットワークの定義
     net = Net()
@@ -70,7 +104,7 @@ if __name__ == '__main__':
     for epoch in range(10):  # loop over the dataset multiple times
 
         running_loss = 0.0
-        for i, data in enumerate(trainloader, 0):
+        for i, data in enumerate(train_dataloader, 0):
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
             #GPUt使うならCUDAにしてあげる
