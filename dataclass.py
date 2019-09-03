@@ -134,3 +134,25 @@ inputs, labels = next(
     batch_iterator)  # 1番目の要素を取り出す
 print(inputs.size())
 print(labels)
+
+
+class Image_Clasification_Dataset(data.Dataset):
+    def __init__(self):
+        # TODO:ファイルパスまたはファイル名のリストを取得
+        # TODO:transform何を使うかを指定
+        # TODO:TrainかValかTestか指定
+        # TODO:クラス数を指定
+        # train/val/testの下にclass1,2,3…というフォルダがあり、その中にそのクラスの画像が入っている構造にする。
+        # そうなっていないときにそうしやすくするツールを作っておく？
+
+
+
+    def __getitem__(self, index):
+        # TODO:画像の読み込み
+        # TODO:データの前処理
+        # TODO:imageとlabelを返す
+    def __len__(self):
+        # initで取得したパスを指定
+        len(self.images)
+
+    # TODO:後で実装ハンドブックp.85にある蟻と蜂のデータセットの描写を参考にDatasetのDebuck用コードを作成する。
