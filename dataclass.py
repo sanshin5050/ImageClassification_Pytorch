@@ -139,7 +139,15 @@ print(labels)
 class Image_Clasification_Dataset(data.Dataset):
     def __init__(self):
         # TODO:ファイルパスまたはファイル名のリストを取得
+            # Config Fileで指定したフォルダを見に行く
+            # 構成はtrain,val,testフォルダが存在
+            # その下にclass0 class1 ...とクラス数分フォルダが存在
+            # Config Fileのクラス名とクラス番号を指定して割り振る
+            # 指定していなかったら自動で割り振る、これをConfigにも反映する
         # TODO:transform何を使うかを指定
+            # 前処理部分：標準化の仕方
+            # DataAugumentation
+            # Upsampling/Downsampling ?
         # TODO:TrainかValかTestか指定
         # TODO:クラス数を指定
         # train/val/testの下にclass1,2,3…というフォルダがあり、その中にそのクラスの画像が入っている構造にする。
